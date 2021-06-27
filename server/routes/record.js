@@ -1,5 +1,8 @@
 const express = require("express");
 const nodemailer = require("nodemailer");
+//const schedule= require('node-schedule');
+let cron = require('node-cron');
+
 
 // recordRoutes is an instance of the express router.
 // We use it to define our routes.
@@ -9,7 +12,18 @@ const recordRoutes = express.Router();
 //This will help us connect to the database
 const dbo = require("../db/conn");
 
+recordRoutes.route("/").get(function (req, res) {
+  let db_connect = dbo.getDb("user");
+ 
+  let myobj = {
+    email: req.body.email,
+    pwd: req.body.pwd,
+  };
+  db_connect.collection("maildata").insertOne(myobj, function (err, res) {
+    if (err) throw err;
+  });
 
+});
 
 // This section will help you get a list of all the records.
 recordRoutes.route("/record").get(function (req, res) {
@@ -32,49 +46,146 @@ recordRoutes.route("/record/add").post(function (req, res) {
     cc: req.body.cc,
     subject: req.body.subject,
     mbody:req.body.mbody,
-    schedule:req.body.schedule
+    schedules:req.body.schedules
   };
   db_connect.collection("maildata").insertOne(myobj, function (err, res) {
     if (err) throw err;
   });
 
-  
-  // async..await is not allowed in global scope, must use a wrapper
-  async function main() {
-    // Generate test SMTP service account from ethereal.email
-    // Only needed if you don't have a real mail account for testing
-    let testAccount = await nodemailer.createTestAccount();
-  
-    // create reusable transporter object using the default SMTP transport
-    let transporter = nodemailer.createTransport({
+
+  let transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
           user: 'catchtheholic@gmail.com',
           pass: 'highrunner2'
       }
   });
+
+  console.log("schedule: %s", req.body.schedules);
+  switch(req.body.schedules) {
+    case "Recurring schedule":
+      cron.schedule('*/20 * * * *', () => {
+        // Send e-mail
+      
+        // send mail with defined transport object
+        let info =  transporter.sendMail({
+          from: '', // sender address
+          to: req.body.toreceiver, // list of receivers
+          subject: req.body.subject, // Subject line
+          text: req.body.mbody, // plain text body
+          html: "<b>Mail sent</b>", // html body
+        });
+      
+        console.log("Message sent: %s", info.messageId);
+        // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+      
+        // Preview only available when sending through an Ethereal account
+        console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+        // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+    
+      });
+      break;
+    case "Weekly schedule":
+      cron.schedule('* * * * *', () => {
+        // Send e-mail
+      
+        // send mail with defined transport object
+        let info =  transporter.sendMail({
+          from: '', // sender address
+          to: req.body.toreceiver, // list of receivers
+          subject: req.body.subject, // Subject line
+          text: req.body.mbody, // plain text body
+          html: "<b>Mail sent</b>", // html body
+        });
+      
+        console.log("Message sent: %s", info.messageId);
+        // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+      
+        // Preview only available when sending through an Ethereal account
+        console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+        // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+    
+      });
+      
+      break;
+      
+    case "Monthly schedule":
+      cron.schedule('* * * */1 *', () => {
+        // Send e-mail
+      
+        // send mail with defined transport object
+        let info =  transporter.sendMail({
+          from: '', // sender address
+          to: req.body.toreceiver, // list of receivers
+          subject: req.body.subject, // Subject line
+          text: req.body.mbody, // plain text body
+          html: "<b>Mail sent</b>", // html body
+        });
+      
+        console.log("Message sent: %s", info.messageId);
+        // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+      
+        // Preview only available when sending through an Ethereal account
+        console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+        // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+    
+      });
+      
+      break;
+
+    case "Yearly schedule":
+      cron.schedule('* * * */12 *', () => {
+        // Send e-mail
+      
+        // send mail with defined transport object
+        let info =  transporter.sendMail({
+          from: '', // sender address
+          to: req.body.toreceiver, // list of receivers
+          subject: req.body.subject, // Subject line
+          text: req.body.mbody, // plain text body
+          html: "<b>Mail sent</b>", // html body
+        });
+      
+        console.log("Message sent: %s", info.messageId);
+        // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+      
+        // Preview only available when sending through an Ethereal account
+        console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+        // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+    
+      });
+      
+      break;
+
+
+    default:
+      cron.schedule('* * * * *', () => {
+        // Send e-mail
+      
+        // send mail with defined transport object
+        let info =  transporter.sendMail({
+          from: '', // sender address
+          to: req.body.toreceiver, // list of receivers
+          subject: req.body.subject, // Subject line
+          text: req.body.mbody, // plain text body
+          html: "<b>Mail sent</b>", // html body
+        });
+      
+        console.log("Message sent: %s", info.messageId);
+        // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+      
+        // Preview only available when sending through an Ethereal account
+        console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+        // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+    
+      });
+      
+  } 
+  
     
   
-    // send mail with defined transport object
-    let info = await transporter.sendMail({
-      from: '', // sender address
-      to: req.body.toreceiver, // list of receivers
-      subject: req.body.subject, // Subject line
-      text: req.body.mbody, // plain text body
-      html: "<b>Mail sent</b>", // html body
-    });
-  
-    console.log("Message sent: %s", info.messageId);
-    // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-  
-    // Preview only available when sending through an Ethereal account
-    console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-    // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
-  }
-  
-  main().catch(console.error);
-
 });
+
 
 // This section will help you update a record by id.
 recordRoutes.route("/update/:id").post(function (req, res) {
@@ -86,7 +197,7 @@ recordRoutes.route("/update/:id").post(function (req, res) {
       cc: req.body.cc,
       subject: req.body.subject,
       mbody:req.body.mbody,
-      schedule:req.body.schedule
+      schedules:req.body.schedules
     },
   };
   db_connect

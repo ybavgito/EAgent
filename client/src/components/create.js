@@ -11,7 +11,7 @@ export default class Create extends Component {
     this.onChangeCC = this.onChangeCC.bind(this);
     this.onChangeSubject = this.onChangeSubject.bind(this);
     this.onChangeMbody = this.onChangeMbody.bind(this);
-    this.onChangeSchedule = this.onChangeSchedule.bind(this);
+    this.onChangeschedules = this.onChangeschedules.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
 
     this.state = {
@@ -19,7 +19,7 @@ export default class Create extends Component {
         cc: "",
         subject: "",
         mbody: "",
-        schedule: "",
+        schedules: "",
 
     };
   }
@@ -49,9 +49,9 @@ export default class Create extends Component {
     });
   }
 
-  onChangeSchedule(e) {
+  onChangeschedules(e) {
     this.setState({
-      schedule: e.target.value,
+      schedules: e.target.value,
     });
   }
 
@@ -67,7 +67,7 @@ export default class Create extends Component {
         cc: this.state.cc,
         subject: this.state.subject,
         mbody:this.state.mbody,
-        schedule:this.state.schedule,
+        schedules:this.state.schedules,
     };
 
     axios
@@ -80,7 +80,7 @@ export default class Create extends Component {
         cc: "",
         subject: "",
         mbody: "",
-        schedule: "",
+        schedules: "",
     });
   }
 
@@ -135,8 +135,8 @@ export default class Create extends Component {
                 name="Scheduler"
                 id="priorityHigh"
                 value="Recurring schedule"
-                checked={this.state.schedule === "Recurring schedule"}
-                onChange={this.onChangeSchedule}
+                checked={this.state.schedules === "Recurring schedule"}
+                onChange={this.onChangeschedules}
               />
               <label className="form-check-label">Recurring schedule</label>
             </div>
@@ -150,8 +150,8 @@ export default class Create extends Component {
                 name="Scheduler"
                 id="priorityHigh"
                 value="Weekly schedule"
-                checked={this.state.schedule === "Weekly schedule"}
-                onChange={this.onChangeSchedule}
+                checked={this.state.schedules === "Weekly schedule"}
+                onChange={this.onChangeschedules}
               />
               <label className="form-check-label">Weekly schedule</label>
             </div>
@@ -165,8 +165,8 @@ export default class Create extends Component {
                 name="Scheduler"
                 id="priorityHigh"
                 value="Monthly schedule"
-                checked={this.state.schedule === "Monthly schedule"}
-                onChange={this.onChangeSchedule}
+                checked={this.state.schedules === "Monthly schedule"}
+                onChange={this.onChangeschedules}
               />
               <label className="form-check-label">Monthly schedule</label>
             </div>
@@ -180,8 +180,8 @@ export default class Create extends Component {
                 name="Scheduler"
                 id="priorityHigh"
                 value="Yearly schedule"
-                checked={this.state.schedule === "Yearly schedule"}
-                onChange={this.onChangeSchedule}
+                checked={this.state.schedules === "Yearly schedule"}
+                onChange={this.onChangeschedules}
               />
               <label className="form-check-label">Yearly schedule</label>
             </div>
