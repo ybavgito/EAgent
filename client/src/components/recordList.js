@@ -5,15 +5,16 @@ import { Link } from "react-router-dom";
 
 const Record = (props) => (
   <tr>
-    <td>{props.record.person_name}</td>
-    <td>{props.record.person_position}</td>
-    <td>{props.record.person_level}</td>
+    <td>{props.record.toreceiver}</td>
+    <td>{props.record.cc}</td>
+    <td>{props.record.subject}</td>
+    <td>{props.record.schedule}</td>
     <td>
-      <Link to={"/edit/" + props.record._id}>Edit</Link> |
+      <Link to={"/edit/" + props.record.mid}>Edit</Link> |
       <a
         href="/"
         onClick={() => {
-          props.deleteRecord(props.record._id);
+          props.deleteRecord(props.record.mid);
         }}
       >
         Delete
@@ -27,7 +28,7 @@ export default class RecordList extends Component {
   constructor(props) {
     super(props);
     this.deleteRecord = this.deleteRecord.bind(this);
-    this.state = { records: [] };
+    this.state = { maildata: [] };
   }
 
   // This method will get the data from the database.
@@ -35,7 +36,7 @@ export default class RecordList extends Component {
     axios
       .get("http://localhost:3000/record/")
       .then((response) => {
-        this.setState({ records: response.data });
+        this.setState({ maildata: response.data });
       })
       .catch(function (error) {
         console.log(error);
@@ -49,35 +50,36 @@ export default class RecordList extends Component {
     });
 
     this.setState({
-      record: this.state.records.filter((el) => el._id !== id),
+      record: this.state.maildata.filter((el) => el.mid !== id),
     });
   }
 
   // This method will map out the users on the table
   recordList() {
-    return this.state.records.map((currentrecord) => {
+    return this.state.maildata.map((currentrecord) => {
       return (
         <Record
           record={currentrecord}
           deleteRecord={this.deleteRecord}
-          key={currentrecord._id}
+          key={currentrecord.mid}
         />
       );
     });
   }
 
-  // This following section will display the table with the records of individuals.
+  // This following section will display the table with the maildata of individuals.
   render() {
     return (
       <div>
-        <h3>Record List</h3>
+        <h3>History</h3>
         <table className="table table-striped" style={{ marginTop: 20 }}>
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Position</th>
-              <th>Level</th>
-              <th>Action</th>
+              <th>To:</th>
+              <th>cc</th>
+              <th>Subject</th>
+
+              <th>Schedule</th>
             </tr>
           </thead>
           <tbody>{this.recordList()}</tbody>

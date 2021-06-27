@@ -1,4 +1,5 @@
 const express = require("express");
+const nodemailer = require("nodemailer");
 
 // recordRoutes is an instance of the express router.
 // We use it to define our routes.
@@ -8,20 +9,8 @@ const recordRoutes = express.Router();
 //This will help us connect to the database
 const dbo = require("../db/conn");
 
-db.createCollection("counters")
-db.counters.insert({
-  "mid":"id",
-  "sequence_value": 0
-})
 
-function getNextSequenceValue(sequenceName){
-  var sequenceDocument = db.counters.findAndModify({
-     query:{_id: sequenceName },
-     update: {$inc:{sequence_value:1}},
-     new:true
-  });
-  return sequenceDocument.sequence_value;
-}
+
 // This section will help you get a list of all the records.
 recordRoutes.route("/record").get(function (req, res) {
   let db_connect = dbo.getDb("smail");
@@ -39,7 +28,6 @@ recordRoutes.route("/record/add").post(function (req, res) {
   let db_connect = dbo.getDb("smail");
  
   let myobj = {
-    mid:getNextSequenceValue("id"),
     toreceiver: req.body.toreceiver,
     cc: req.body.cc,
     subject: req.body.subject,
@@ -49,6 +37,43 @@ recordRoutes.route("/record/add").post(function (req, res) {
   db_connect.collection("maildata").insertOne(myobj, function (err, res) {
     if (err) throw err;
   });
+
+  
+  // async..await is not allowed in global scope, must use a wrapper
+  async function main() {
+    // Generate test SMTP service account from ethereal.email
+    // Only needed if you don't have a real mail account for testing
+    let testAccount = await nodemailer.createTestAccount();
+  
+    // create reusable transporter object using the default SMTP transport
+    let transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+          user: 'catchtheholic@gmail.com',
+          pass: 'highrunner2'
+      }
+  });
+    
+  
+    // send mail with defined transport object
+    let info = await transporter.sendMail({
+      from: '', // sender address
+      to: req.body.toreceiver, // list of receivers
+      subject: req.body.subject, // Subject line
+      text: req.body.mbody, // plain text body
+      html: "<b>Mail sent</b>", // html body
+    });
+  
+    console.log("Message sent: %s", info.messageId);
+    // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+  
+    // Preview only available when sending through an Ethereal account
+    console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+    // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+  }
+  
+  main().catch(console.error);
+
 });
 
 // This section will help you update a record by id.
